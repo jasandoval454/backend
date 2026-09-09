@@ -1,42 +1,41 @@
 package co.edu.usbcali.jasan.java.controller;
 
-import co.edu.usbcali.jasan.java.domain.Usuario;
+import co.edu.usbcali.jasan.java.domain.Comentario;
+import co.edu.usbcali.jasan.java.domain.repository.ComentarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import co.edu.usbcali.jasan.java.domain.repository.UsuarioRepository;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/usuarios")
-public class UsuarioController {
+@RequestMapping("/comentarios")
+public class ComentarioController {
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private ComentarioRepository comentarioRepository;
 
     @GetMapping("/ping")
     String pingpong() {
         return "pong";
     }
 
-    @GetMapping("/validar-estado")
+    @GetMapping("/validar-stado")
     String validarEstado() {
         return "ok";
     }
 
-
-    @GetMapping("/obtener-usuario")
-    List<Usuario> obtenerUsuarios() {
-        return usuarioRepository.findAll();
+    @GetMapping("/obtener-comentarios")
+    List<Comentario> obtenerComentarios() {
+        return comentarioRepository.findAll();
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable Integer id) {
-        return usuarioRepository.findById(id)
+    ResponseEntity<Comentario> obtenerComentarioPorId(@PathVariable Integer id) {
+        return comentarioRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

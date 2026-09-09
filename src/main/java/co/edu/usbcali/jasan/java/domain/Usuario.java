@@ -1,5 +1,6 @@
 package co.edu.usbcali.jasan.java.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +28,7 @@ public class Usuario {
     @Column(name = "username", nullable = false, length = 50)
     private String username;
 
+    @JsonIgnore
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 

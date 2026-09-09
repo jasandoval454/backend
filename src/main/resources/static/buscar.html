@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscar usuario · Jasan</title>
+    <style>
+        :root {
+            --bg: #f6f5f2;
+            --ink: #1b2430;
+            --muted: #6b7280;
+            --line: #d9dce1;
+            --accent: #2c3e91;
+            --accent-ink: #ffffff;
+            --danger: #b3261e;
+            --card: #ffffff;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 8vh 24px;
+        }
+        main {
+            width: 100%;
+            max-width: 480px;
+        }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 0 4px;
+            letter-spacing: -0.01em;
+        }
+        p.subtitle {
+            margin: 0 0 32px;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+        form {
+            display: flex;
+            gap: 8px;
+        }
+        input[type="number"] {
+            flex: 1;
+            padding: 12px 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--card);
+            color: var(--ink);
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(44, 62, 145, 0.15);
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: var(--accent);
+            color: var(--accent-ink);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        button:hover { background: #24327a; }
+        button:disabled { opacity: 0.6; cursor: default; }
+
+        #resultado {
+            margin-top: 28px;
+        }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 20px 22px;
+        }
+        .card dl {
+            margin: 0;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            row-gap: 10px;
+            column-gap: 16px;
+        }
+        .card dt {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+        .card dd {
+            margin: 0;
+            font-size: 0.95rem;
+            word-break: break-word;
+        }
+        .estado {
+            display: inline-block;
+            margin-bottom: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        .error {
+            border: 1px solid #f0c4c1;
+            background: #fdf1f0;
+            color: var(--danger);
+            border-radius: 10px;
+            padding: 16px 18px;
+            font-size: 0.95rem;
+        }
+        .hint {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Buscar usuario</h1>
+    <p class="subtitle">Escribe el id del usuario y consulta sus datos.</p>
+
+    <form id="form-buscar">
+        <input type="number" id="input-id" placeholder="Ej: 1" min="1" required autofocus>
+        <button type="submit" id="btn-buscar">Buscar</button>
+    </form>
+
+    <div id="resultado"></div>
+</main>
+
+<script>
+    const form = document.getElementById('form-buscar');
+    const input = document.getElementById('input-id');
+    const boton = document.getElementById('btn-buscar');
+    const resultado = document.getElementById('resultado');
+
+    function formatearFecha(valor) {
+        if (!valor) return '—';
+        return valor.replace('T', ' ').slice(0, 19);
+    }
+
+    function mostrarCargando() {
+        resultado.innerHTML = '<p class="hint">Buscando...</p>';
+    }
+
+    function mostrarUsuario(usuario) {
+        resultado.innerHTML = `
+      <div class="card">
+        <span class="estado">Usuario encontrado</span>
+        <dl>
+          <dt>Id</dt><dd>${usuario.id}</dd>
+          <dt>Username</dt><dd>${usuario.username ?? '—'}</dd>
+          <dt>Email</dt><dd>${usuario.email ?? '—'}</dd>
+          <dt>Último acceso</dt><dd>${formatearFecha(usuario.lastLogin)}</dd>
+          <dt>Creado</dt><dd>${formatearFecha(usuario.createdAt)}</dd>
+          <dt>Actualizado</dt><dd>${formatearFecha(usuario.updatedAt)}</dd>
+        </dl>
+      </div>
+    `;
+    }
+
+    function mostrarNoEncontrado(id) {
+        resultado.innerHTML = `<div class="error">No existe ningún usuario con el id ${id}.</div>`;
+    }
+
+    function mostrarErrorConexion() {
+        resultado.innerHTML = `<div class="error">No se pudo conectar con el servidor. ¿Está corriendo la app en el puerto 8080?</div>`;
+    }
+
+    form.addEventListener('submit', async (evento) => {
+        evento.preventDefault();
+        const id = input.value.trim();
+        if (!id) return;
+
+        boton.disabled = true;
+        mostrarCargando();
+
+        try {
+            const respuesta = await fetch(`/usuarios/${id}`);
+            if (respuesta.status === 200) {
+                const usuario = await respuesta.json();
+                mostrarUsuario(usuario);
+            } else if (respuesta.status === 404) {
+                mostrarNoEncontrado(id);
+            } else {
+                mostrarErrorConexion();
+            }
+        } catch (e) {
+            mostrarErrorConexion();
+        } finally {
+            boton.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>

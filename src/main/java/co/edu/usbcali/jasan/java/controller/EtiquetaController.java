@@ -35,8 +35,9 @@ public class EtiquetaController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<Etiqueta> obtenerEtiquetaPorId(@PathVariable Integer id){
-        Etiqueta etiqueta = etiquetaRepository.findById(id).orElse(null);
-        return ResponseEntity.ok(etiqueta);
+    ResponseEntity<Etiqueta> obtenerEtiquetaPorId(@PathVariable Integer id) {
+        return etiquetaRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
