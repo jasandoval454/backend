@@ -48,4 +48,10 @@ public class EtiquetaController {
             throws Exception {
         return ResponseEntity.status(HttpStatus.CREATED).body(etiquetaService.crearEtiqueta(crearEtiqueta));
     }
+
+    @PostMapping("/crear")
+    ResponseEntity<ObtenerEtiquetaResponse> crearEtiquetaCompatibilidad(
+            @RequestBody CrearEtiquetaRequest crearEtiqueta) throws Exception {
+        return ResponseEntity.status(HttpStatus.CREATED).body(etiquetaService.crearEtiqueta(crearEtiqueta));
+    }
 }

@@ -7,6 +7,8 @@ import co.edu.usbcali.jasan.java.mapper.EtiquetaMapper;
 import co.edu.usbcali.jasan.java.domain.repository.EtiquetaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +19,7 @@ public class EtiquetaServiceImpl implements EtiquetaService{
     private EtiquetaRepository etiquetaRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<ObtenerEtiquetaResponse> obtenerEtiquetas() {
         List<Etiqueta> todasLasEtiquetas = etiquetaRepository.findAll();
         List<ObtenerEtiquetaResponse> etiquetasResponses =
@@ -25,6 +28,7 @@ public class EtiquetaServiceImpl implements EtiquetaService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ObtenerEtiquetaResponse obtenerEtiquetaPorId(Integer id) throws Exception {
         // Validar que id no sea nulo
         if (id == null) {
@@ -52,6 +56,7 @@ public class EtiquetaServiceImpl implements EtiquetaService{
     }
 
     @Override
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
     public ObtenerEtiquetaResponse crearEtiqueta(CrearEtiquetaRequest crearEtiqueta) throws Exception {
         if (crearEtiqueta == null || crearEtiqueta.nombre() == null || crearEtiqueta.nombre().isBlank()) {
             throw new Exception("El nombre de la etiqueta es obligatorio");
@@ -60,6 +65,9 @@ public class EtiquetaServiceImpl implements EtiquetaService{
         String nombre = crearEtiqueta.nombre().trim();
         if (nombre.length() > 100) {
             throw new Exception("El nombre de la etiqueta no puede superar los 100 caracteres");
+        }
+        if (etiquetaRepository.existsByNombre(nombre)) {
+            throw new Exception("El nombre de la etiqueta ya existe");
         }
 
         Etiqueta etiquetaGuardada = etiquetaRepository.save(
