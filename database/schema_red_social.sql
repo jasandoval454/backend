@@ -240,6 +240,42 @@ CREATE TABLE actividad_historial (
         REFERENCES usuarios (id) ON DELETE CASCADE
 );
 
+-- ------------------------------------------------------------
+-- Mensajes directos entre usuarios
+-- ------------------------------------------------------------
+CREATE TABLE conversaciones (
+    id          SERIAL PRIMARY KEY,
+    usuario_1_id INTEGER NOT NULL,
+    usuario_2_id INTEGER NOT NULL,
+    created_at  TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_conversaciones_participantes UNIQUE (usuario_1_id, usuario_2_id),
+    CONSTRAINT ck_conversaciones_no_auto CHECK (usuario_1_id <> usuario_2_id),
+    CONSTRAINT fk_conversaciones_usuario_1 FOREIGN KEY (usuario_1_id)
+        REFERENCES usuarios (id) ON DELETE CASCADE,
+    CONSTRAINT fk_conversaciones_usuario_2 FOREIGN KEY (usuario_2_id)
+        REFERENCES usuarios (id) ON DELETE CASCADE
+);
+
+CREATE TABLE mensajes (
+    id              SERIAL PRIMARY KEY,
+    conversacion_id INTEGER NOT NULL,
+    remitente_id    INTEGER NOT NULL,
+    destinatario_id INTEGER NOT NULL,
+    contenido       VARCHAR(2000) NOT NULL,
+    leido           BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at      TIMESTAMP,
+    CONSTRAINT fk_mensajes_conversacion FOREIGN KEY (conversacion_id)
+        REFERENCES conversaciones (id) ON DELETE CASCADE,
+    CONSTRAINT ck_mensajes_no_auto_mensaje CHECK (remitente_id <> destinatario_id),
+    CONSTRAINT fk_mensajes_remitente FOREIGN KEY (remitente_id)
+        REFERENCES usuarios (id) ON DELETE CASCADE,
+    CONSTRAINT fk_mensajes_destinatario FOREIGN KEY (destinatario_id)
+        REFERENCES usuarios (id) ON DELETE CASCADE
+);
+
 -- ============================================================
 -- Índices adicionales para búsquedas y llaves foráneas frecuentes
 -- ============================================================
@@ -276,6 +312,13 @@ CREATE INDEX idx_denuncias_estado ON denuncias (estado);
 
 -- Actividad (RF-13): historial por usuario ordenado por fecha
 CREATE INDEX idx_actividad_historial_usuario ON actividad_historial (usuario_id, created_at DESC);
+
+-- Mensajes: historial de conversaciones y bandeja de no leídos
+CREATE INDEX idx_conversaciones_usuario_1 ON conversaciones (usuario_1_id, updated_at DESC);
+CREATE INDEX idx_conversaciones_usuario_2 ON conversaciones (usuario_2_id, updated_at DESC);
+CREATE INDEX idx_mensajes_conversacion ON mensajes (conversacion_id, created_at ASC);
+CREATE INDEX idx_mensajes_remitente_destinatario ON mensajes (remitente_id, destinatario_id, created_at ASC);
+CREATE INDEX idx_mensajes_destinatario_no_leidos ON mensajes (destinatario_id, leido, created_at ASC);
 
 -- Búsqueda (RF-10): búsqueda por similitud de texto en publicaciones y username
 CREATE INDEX idx_publicaciones_contenido_trgm ON publicaciones USING GIN (contenido gin_trgm_ops);

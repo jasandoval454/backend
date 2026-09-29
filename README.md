@@ -22,7 +22,7 @@ Ejecuta los scripts en PostgreSQL en este orden:
 
 El esquema incluye usuarios, perfiles, relaciones, publicaciones, medios,
 etiquetas, reacciones, comentarios, notificaciones, bloqueos, denuncias y
-actividad histórica.
+actividad histórica y mensajes directos.
 
 ## Ejecución
 
@@ -43,6 +43,8 @@ Endpoints iniciales:
 - `/denuncias`
 - `/medios`
 - `/notificaciones`
+- `/mensajes`
+- `/conversaciones`
 - `/perfiles`
 - `/publicacion-etiquetas`
 - `/reacciones`
