@@ -17,7 +17,7 @@ public class JasanJavaApplication {
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void abrirNavegador() {
-		String url = "http://localhost:8080/buscar.html";
+		String url = "http://localhost:8080/swagger-ui/index.html";
 		try {
 			if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
 				Desktop.getDesktop().browse(new URI(url));
@@ -25,7 +25,7 @@ public class JasanJavaApplication {
 				System.out.println("Abre manualmente: " + url);
 			}
 		} catch (Exception e) {
-			System.out.println("No se pudo abrir el navegador automáticamente. Entra manualmente a: " + url);
+			System.out.println("No se pudo abrir Swagger automáticamente. Entra manualmente a: " + url);
 		}
 	}
 }
