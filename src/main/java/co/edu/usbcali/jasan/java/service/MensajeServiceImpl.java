@@ -1,7 +1,7 @@
 package co.edu.usbcali.jasan.java.service;
 
-import co.edu.usbcali.jasan.java.domain.Mensaje;
 import co.edu.usbcali.jasan.java.domain.Conversacion;
+import co.edu.usbcali.jasan.java.domain.Mensaje;
 import co.edu.usbcali.jasan.java.domain.Usuario;
 import co.edu.usbcali.jasan.java.domain.repository.ConversacionRepository;
 import co.edu.usbcali.jasan.java.domain.repository.MensajeRepository;
@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class MensajeServiceImpl implements MensajeService {

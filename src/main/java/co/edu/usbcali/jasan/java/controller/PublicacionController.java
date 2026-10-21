@@ -1,9 +1,11 @@
 package co.edu.usbcali.jasan.java.controller;
 
 import co.edu.usbcali.jasan.java.dto.request.CrearPublicacionRequest;
+import co.edu.usbcali.jasan.java.dto.request.ModificarPublicacionRequest;
 import co.edu.usbcali.jasan.java.dto.response.ObtenerPublicacionResponse;
 import co.edu.usbcali.jasan.java.service.PublicacionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +28,24 @@ public class PublicacionController {
         return ResponseEntity.ok(publicacionService.obtenerPublicacionPorId(id));
     }
 
-    @PostMapping
+    @PostMapping("/crear")
     public ResponseEntity<ObtenerPublicacionResponse> crearPublicacion(@RequestBody CrearPublicacionRequest crearPublicacionRequest) throws Exception {
-        return ResponseEntity.ok(publicacionService.crearPublicacion(crearPublicacionRequest));
+        return new ResponseEntity<>(publicacionService.crearPublicacion(crearPublicacionRequest), HttpStatus.CREATED);
     }
+
+    @PutMapping("/modificar/{id}")
+    public ResponseEntity<ObtenerPublicacionResponse> modificarPublicacion(
+            @PathVariable Integer id,
+            @RequestBody ModificarPublicacionRequest modificarPublicacionRequest) throws Exception {
+        return ResponseEntity.ok(
+                publicacionService.modificarPublicacion(id, modificarPublicacionRequest)
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarPublicacion(@PathVariable Integer id) throws Exception {
+        publicacionService.eliminarPublicacion(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

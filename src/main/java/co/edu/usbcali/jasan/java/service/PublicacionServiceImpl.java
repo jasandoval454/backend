@@ -6,6 +6,7 @@ import co.edu.usbcali.jasan.java.domain.enums.PrivacidadPublicacion;
 import co.edu.usbcali.jasan.java.domain.repository.PublicacionRepository;
 import co.edu.usbcali.jasan.java.domain.repository.UsuarioRepository;
 import co.edu.usbcali.jasan.java.dto.request.CrearPublicacionRequest;
+import co.edu.usbcali.jasan.java.dto.request.ModificarPublicacionRequest;
 import co.edu.usbcali.jasan.java.dto.response.ObtenerPublicacionResponse;
 import co.edu.usbcali.jasan.java.mapper.PublicacionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +31,7 @@ public class PublicacionServiceImpl implements PublicacionService {
     @Transactional(readOnly = true)
     public List<ObtenerPublicacionResponse> obtenerPublicaciones() {
         return PublicacionMapper.listaPublicacionesHaciaListaObtenerPublicacionesResponse(
-                publicacionRepository.findAll()
+                publicacionRepository.findAllByDeletedAtIsNullOrderByCreatedAtDesc()
         );
     }
 
@@ -43,7 +45,7 @@ public class PublicacionServiceImpl implements PublicacionService {
             throw new Exception("El valor del id no puede ser inferior o igual a cero para buscar");
         }
 
-        Optional<Publicacion> publicacionOptional = publicacionRepository.findById(id);
+        Optional<Publicacion> publicacionOptional = publicacionRepository.findByIdAndDeletedAtIsNull(id);
         if (publicacionOptional.isEmpty()) {
             throw new Exception("No existe la publicación");
         }
@@ -66,6 +68,14 @@ public class PublicacionServiceImpl implements PublicacionService {
             throw new Exception("El id del autor debe ser mayor que cero");
         }
 
+        if (crearPublicacionRequest.contenido() == null
+                || crearPublicacionRequest.contenido().isBlank()) {
+            throw new Exception("El contenido de la publicación no puede ser nulo ni vacío");
+        }
+        if (crearPublicacionRequest.contenido().length() > 1000) {
+            throw new Exception("El contenido de la publicación no puede superar los 1000 caracteres");
+        }
+
         if (crearPublicacionRequest.privacidadPublicacion() == null
                 || crearPublicacionRequest.privacidadPublicacion().isBlank()) {
             throw new Exception("La privacidad de la publicación no puede ser nula o vacía");
@@ -86,5 +96,63 @@ public class PublicacionServiceImpl implements PublicacionService {
         publicacion = publicacionRepository.save(publicacion);
 
         return PublicacionMapper.publicacionAObtenerPublicacionResponse(publicacion);
+    }
+
+    @Override
+    @Transactional
+    public ObtenerPublicacionResponse modificarPublicacion(
+            Integer id,
+            ModificarPublicacionRequest request
+    ) throws Exception {
+        validarId(id);
+        if (request == null || (request.contenido() == null && request.privacidadPublicacion() == null)) {
+            throw new Exception("Debe indicar al menos un campo para modificar");
+        }
+
+        Publicacion publicacion = publicacionRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new Exception("No existe la publicación con el id: " + id));
+
+        if (request.contenido() != null) {
+            if (request.contenido().isBlank()) {
+                throw new Exception("El contenido de la publicación no puede ser nulo ni vacío");
+            }
+            if (request.contenido().length() > 1000) {
+                throw new Exception("El contenido de la publicación no puede superar los 1000 caracteres");
+            }
+            publicacion.setContenido(request.contenido());
+        }
+
+        if (request.privacidadPublicacion() != null) {
+            if (request.privacidadPublicacion().isBlank()) {
+                throw new Exception("La privacidad de la publicación no puede ser nula o vacía");
+            }
+            PrivacidadPublicacion privacidad = PrivacidadPublicacion
+                    .getPrivacidadPublicacion(request.privacidadPublicacion());
+            if (privacidad == null) {
+                throw new Exception("No se ha encontrado la privacidad-publicacion: "
+                        + request.privacidadPublicacion() + ".");
+            }
+            publicacion.setPrivacidad(privacidad);
+        }
+
+        return PublicacionMapper.publicacionAObtenerPublicacionResponse(
+                publicacionRepository.save(publicacion)
+        );
+    }
+
+    @Override
+    @Transactional
+    public void eliminarPublicacion(Integer id) throws Exception {
+        validarId(id);
+        Publicacion publicacion = publicacionRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new Exception("No existe la publicación con el id: " + id));
+        publicacion.setDeletedAt(LocalDateTime.now());
+        publicacionRepository.save(publicacion);
+    }
+
+    private void validarId(Integer id) throws Exception {
+        if (id == null || id <= 0) {
+            throw new Exception("El id de la publicación debe ser mayor que cero");
+        }
     }
 }

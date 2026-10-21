@@ -34,6 +34,10 @@ Configura las credenciales de PostgreSQL en
 .\mvnw.cmd spring-boot:run
 ```
 
+Consulta la [documentación técnica](documentacion/doc-tecnica-backend.md),
+la [guía de onboarding](documentacion/doc-onboarding-equipo.md) y los
+[requisitos funcionales](documentacion/requisitos-funcionales.md).
+
 Endpoints iniciales:
 
 - `/usuarios`

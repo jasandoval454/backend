@@ -7,6 +7,7 @@ pero mantiene el mismo dominio funcional de la referencia.
 ## Referencias
 
 - [README del proyecto](../README.md)
+- [Requisitos funcionales de la red social](requisitos-funcionales.md)
 - [Creación de la base de datos](../database/create-db.sql)
 - [Esquema PostgreSQL](../database/schema_red_social.sql)
 - [Datos de prueba](../database/data_test_red_social.sql)
@@ -16,6 +17,8 @@ pero mantiene el mismo dominio funcional de la referencia.
 El backend ya cuenta con entidades JPA, repositorios, controladores para las
 entidades principales, DTOs y un servicio de etiquetas. La validación de
 etiquetas incluye control de nombre vacío, longitud máxima y duplicados.
+Los servicios de publicaciones y etiquetas contienen lógica de negocio; los
+demás controladores actuales exponen principalmente consultas.
 
 ## Pendientes principales
 
