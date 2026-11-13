@@ -1,13 +1,15 @@
 package co.edu.usbcali.jasan.java.controller;
 
-import co.edu.usbcali.jasan.java.domain.Usuario;
+import co.edu.usbcali.jasan.java.dto.request.CrearUsuarioRequest;
 import co.edu.usbcali.jasan.java.dto.response.ObtenerUsuarioResponse;
-import co.edu.usbcali.jasan.java.mapper.UsuarioMapper;
-import co.edu.usbcali.jasan.java.domain.repository.UsuarioRepository;
+import co.edu.usbcali.jasan.java.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,9 +19,8 @@ import java.util.List;
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
-    // Inyección de dependencias
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private UsuarioService usuarioService;
 
     @GetMapping("/ping")
     String pingPong() {
@@ -33,20 +34,16 @@ public class UsuarioController {
 
     @GetMapping("/obtener-usuarios")
     List<ObtenerUsuarioResponse> obtenerUsuarios() {
-        List<Usuario> usuarios = usuarioRepository.findAll();
-        List<ObtenerUsuarioResponse> usuariosResponse =
-                UsuarioMapper.listaUsuariosHaciaListaObtenerUsuariosResponse(usuarios);
-        return usuariosResponse;
+        return usuarioService.obtenerUsuarios();
     }
 
     @GetMapping("/{id}")
     ResponseEntity<ObtenerUsuarioResponse> obtenerUsuarioPorId(@PathVariable Integer id) {
-        Usuario usuario = usuarioRepository.findById(id).orElse(null);
-        assert usuario != null;
-        ObtenerUsuarioResponse usuarioResponse =
-                UsuarioMapper.usuarioAObtenerUsuarioResponse(usuario);
-        return ResponseEntity.ok(
-                usuarioResponse
-        );
+        return ResponseEntity.ok(usuarioService.obtenerUsuarioPorId(id));
+    }
+
+    @PostMapping({"", "/crear"})
+    ResponseEntity<ObtenerUsuarioResponse> crearUsuario(@RequestBody CrearUsuarioRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.crearUsuario(request));
     }
 }

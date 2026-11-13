@@ -28,8 +28,20 @@ public class Medio {
     @Column(name = "tipo", nullable = false)
     private TipoMedio tipo;
 
-    @Column(name = "url", nullable = false, length = 500)
+    @Column(name = "url_original", nullable = false, length = 500)
     private String url;
+
+    @Column(name = "url_thumbnail", length = 500)
+    private String urlThumbnail;
+
+    @Column(name = "formato", length = 20)
+    private String formato;
+
+    @Column(name = "tamano_bytes")
+    private Integer tamanoBytes;
+
+    @Column(name = "orden", nullable = false)
+    private Short orden;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -37,5 +49,8 @@ public class Medio {
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
+        if (orden == null) {
+            orden = 0;
+        }
     }
 }

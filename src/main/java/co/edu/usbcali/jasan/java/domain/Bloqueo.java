@@ -21,7 +21,7 @@ public class Bloqueo {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_bloqueador_id", nullable = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuarioBloqueador;
 
     @ManyToOne

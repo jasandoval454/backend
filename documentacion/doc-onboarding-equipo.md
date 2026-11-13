@@ -20,6 +20,11 @@ crea el usuario/base de datos y requiere permisos administrativos. La
 configuración local de conexión se encuentra en
 `src/main/resources/application.properties`.
 
+Si la base ya existía desde una versión anterior, no ejecutes de nuevo los
+scripts de creación sobre sus datos. Haz primero una copia de seguridad y
+ejecuta `database/migrate_legacy_schema_to_red_social.sql` para renombrar y
+completar las columnas que requiere el modelo actual sin borrar registros.
+
 No guardes credenciales reales en Git ni las compartas en documentación.
 
 ## Compilar, probar y ejecutar

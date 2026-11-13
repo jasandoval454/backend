@@ -11,6 +11,7 @@ como objetivo y no implican que todos los flujos estén implementados.
 
 - Java 25 y Maven Wrapper.
 - Spring Boot 4.1.0, Spring Web y Spring Data JPA.
+- Spring Security Crypto para codificar contraseñas con BCrypt.
 - PostgreSQL y Hibernate/JPA.
 - Lombok.
 
@@ -21,6 +22,10 @@ documentación, commits y otros archivos versionados. Los scripts de
 `schema_red_social.sql` y `data_test_red_social.sql`.
 
 ## Organización
+
+Para una base ya creada con columnas antiguas, usa la migración
+`database/migrate_legacy_schema_to_red_social.sql` en lugar de recrearla;
+haz una copia de seguridad antes de ejecutarla.
 
 El código de aplicación vive en
 `src/main/java/co/edu/usbcali/jasan/java/`:
@@ -40,7 +45,9 @@ notificaciones, bloqueos, denuncias e historial de actividad.
 El backend cuenta con controladores para usuarios, perfiles, relaciones,
 publicaciones, comentarios, reacciones, etiquetas, medios, notificaciones,
 bloqueos, denuncias y la asociación publicación-etiqueta. Publicaciones y
-etiquetas tienen servicios con validaciones de negocio; varios de los demás
+etiquetas tienen servicios con validaciones de negocio. Usuarios y perfiles
+también cuentan con servicios para registro, creación y edición. Medios y
+notificaciones permiten registrar sus metadatos/eventos; varios de los demás
 controladores ofrecen principalmente consultas directas a repositorios.
 
 El servicio de publicaciones permite listar, consultar, crear y modificar
@@ -48,8 +55,10 @@ publicaciones, y eliminarlas de forma lógica. Las consultas excluyen las
 publicaciones eliminadas. La creación y modificación validan contenido y
 privacidad; la creación también valida la existencia del autor. La creación de
 etiquetas valida el nombre, su longitud y que no esté duplicado. La
-autenticación, el feed, la carga de medios, la paginación y otros requisitos
-funcionales aún deben verificarse o completarse antes de considerarlos
+creación de usuarios valida los datos y almacena la contraseña con BCrypt; los
+perfiles admiten creación y edición parcial. La autenticación con inicio de
+sesión y tokens, el feed, la carga/optimización de archivos, la paginación y
+otros requisitos funcionales aún deben completarse antes de considerarlos
 disponibles.
 
 ## Pruebas

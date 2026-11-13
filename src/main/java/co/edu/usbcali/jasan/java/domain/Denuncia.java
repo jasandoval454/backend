@@ -1,5 +1,6 @@
 package co.edu.usbcali.jasan.java.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import co.edu.usbcali.jasan.java.domain.enums.EstadoDenuncia;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,8 +23,13 @@ public class Denuncia {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "denunciante_id", nullable = false)
+    @JoinColumn(name = "usuario_reportante_id", nullable = false)
     private Usuario denunciante;
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "usuario_reportado_id")
+    private Usuario usuarioReportado;
 
     @ManyToOne
     @JoinColumn(name = "publicacion_id")
@@ -42,21 +48,9 @@ public class Denuncia {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
     @PrePersist
     public void prePersist() {
-        LocalDateTime now = LocalDateTime.now();
-        createdAt = now;
-        updatedAt = now;
-        if (estado == null) {
-            estado = EstadoDenuncia.PENDIENTE;
-        }
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        updatedAt = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
+        if (estado == null) estado = EstadoDenuncia.PENDIENTE;
     }
 }

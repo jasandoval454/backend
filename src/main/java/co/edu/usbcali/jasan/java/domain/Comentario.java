@@ -25,14 +25,14 @@ public class Comentario {
     private Publicacion publicacion;
 
     @ManyToOne
-    @JoinColumn(name = "autor_id", nullable = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario autor;
 
     @ManyToOne
     @JoinColumn(name = "comentario_padre_id")
     private Comentario comentarioPadre;
 
-    @Column(name = "contenido", nullable = false, length = 500)
+    @Column(name = "contenido", nullable = false, length = 1000)
     private String contenido;
 
     @Column(name = "created_at", nullable = false)

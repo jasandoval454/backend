@@ -23,6 +23,9 @@ Ejecuta los scripts en PostgreSQL en este orden:
 El esquema incluye usuarios, perfiles, relaciones, publicaciones, medios,
 etiquetas, reacciones, comentarios, notificaciones, bloqueos, denuncias y
 actividad histórica y mensajes directos.
+Si ya tienes una base creada con la versión anterior del proyecto, haz una
+copia de seguridad y ejecuta `database/migrate_legacy_schema_to_red_social.sql`
+en esa base; no vuelvas a ejecutar los scripts iniciales sobre datos existentes.
 
 ## Ejecución
 
@@ -56,3 +59,8 @@ Endpoints iniciales:
 
 La creación de etiquetas acepta tanto `POST /etiquetas` como
 `POST /etiquetas/crear` para mantener compatibilidad con `2026_2`.
+El registro acepta `POST /usuarios` o `POST /usuarios/crear`; las contraseñas
+se guardan con BCrypt. Los perfiles se pueden crear con `POST /perfiles` y
+editar parcialmente con `PUT /perfiles/{id}`. También se pueden asociar
+metadatos multimedia con `POST /medios` y registrar notificaciones con
+`POST /notificaciones`.
