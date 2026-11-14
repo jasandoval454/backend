@@ -16,4 +16,6 @@ public interface ComentarioRepository extends JpaRepository<Comentario, Integer>
             Integer id,
             Integer publicacionId
     );
+
+    Optional<Comentario> findByIdAndDeletedAtIsNull(Integer id);
 }

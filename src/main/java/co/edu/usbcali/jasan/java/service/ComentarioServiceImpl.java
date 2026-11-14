@@ -7,6 +7,7 @@ import co.edu.usbcali.jasan.java.domain.repository.ComentarioRepository;
 import co.edu.usbcali.jasan.java.domain.repository.PublicacionRepository;
 import co.edu.usbcali.jasan.java.domain.repository.UsuarioRepository;
 import co.edu.usbcali.jasan.java.dto.request.CrearComentarioRequest;
+import co.edu.usbcali.jasan.java.dto.request.ModificarComentarioRequest;
 import co.edu.usbcali.jasan.java.dto.response.ObtenerComentarioResponse;
 import co.edu.usbcali.jasan.java.mapper.ComentarioMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,32 @@ public class ComentarioServiceImpl implements ComentarioService {
         comentario.setPublicacion(publicacion);
         comentario.setAutor(autor);
         comentario.setComentarioPadre(comentarioPadre);
+
+        return ComentarioMapper.comentarioAObtenerComentarioResponse(
+                comentarioRepository.save(comentario)
+        );
+    }
+
+    @Override
+    @Transactional
+    public ObtenerComentarioResponse modificarComentario(
+            Integer id,
+            ModificarComentarioRequest request
+    ) throws Exception {
+        validarId(id, "comentario");
+        if (request == null || request.contenido() == null) {
+            throw new Exception("Debe indicar el contenido del comentario para modificarlo");
+        }
+        if (request.contenido().isBlank()) {
+            throw new Exception("El contenido del comentario no puede ser vacío");
+        }
+        if (request.contenido().trim().length() > 1000) {
+            throw new Exception("El contenido del comentario no puede superar los 1000 caracteres");
+        }
+
+        Comentario comentario = comentarioRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new Exception("No existe el comentario con el id: " + id));
+        comentario.setContenido(request.contenido().trim());
 
         return ComentarioMapper.comentarioAObtenerComentarioResponse(
                 comentarioRepository.save(comentario)

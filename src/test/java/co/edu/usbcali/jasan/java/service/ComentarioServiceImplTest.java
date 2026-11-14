@@ -7,6 +7,7 @@ import co.edu.usbcali.jasan.java.domain.repository.ComentarioRepository;
 import co.edu.usbcali.jasan.java.domain.repository.PublicacionRepository;
 import co.edu.usbcali.jasan.java.domain.repository.UsuarioRepository;
 import co.edu.usbcali.jasan.java.dto.request.CrearComentarioRequest;
+import co.edu.usbcali.jasan.java.dto.request.ModificarComentarioRequest;
 import co.edu.usbcali.jasan.java.dto.response.ObtenerComentarioResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -80,6 +81,56 @@ class ComentarioServiceImplTest {
                 ));
 
         assertEquals("El comentario padre no existe en la publicación indicada", exception.getMessage());
+        verify(comentarioRepository, never()).save(org.mockito.ArgumentMatchers.any(Comentario.class));
+    }
+
+    @Test
+    void modificarComentarioActualizaContenido() throws Exception {
+        LocalDateTime fecha = LocalDateTime.now();
+        Comentario comentario = Comentario.builder()
+                .id(30)
+                .publicacion(Publicacion.builder().id(10).build())
+                .autor(Usuario.builder().id(20).build())
+                .contenido("Contenido anterior")
+                .createdAt(fecha)
+                .updatedAt(fecha)
+                .build();
+        when(comentarioRepository.findByIdAndDeletedAtIsNull(30))
+                .thenReturn(Optional.of(comentario));
+        when(comentarioRepository.save(comentario)).thenReturn(comentario);
+
+        ObtenerComentarioResponse response = comentarioService.modificarComentario(
+                30,
+                new ModificarComentarioRequest("  Contenido actualizado  ")
+        );
+
+        assertEquals("Contenido actualizado", response.contenido());
+        verify(comentarioRepository).save(comentario);
+    }
+
+    @Test
+    void modificarComentarioRechazaContenidoVacio() {
+        Exception exception = assertThrows(Exception.class, () ->
+                comentarioService.modificarComentario(
+                        30,
+                        new ModificarComentarioRequest("   ")
+                ));
+
+        assertEquals("El contenido del comentario no puede ser vacío", exception.getMessage());
+        verify(comentarioRepository, never()).save(org.mockito.ArgumentMatchers.any(Comentario.class));
+    }
+
+    @Test
+    void modificarComentarioRechazaComentarioInexistente() {
+        when(comentarioRepository.findByIdAndDeletedAtIsNull(30)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(Exception.class, () ->
+                comentarioService.modificarComentario(
+                        30,
+                        new ModificarComentarioRequest("Contenido actualizado")
+                ));
+
+        assertEquals("No existe el comentario con el id: 30", exception.getMessage());
         verify(comentarioRepository, never()).save(org.mockito.ArgumentMatchers.any(Comentario.class));
     }
 }
