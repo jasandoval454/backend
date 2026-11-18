@@ -55,11 +55,14 @@ publicaciones, y eliminarlas de forma lógica. Las consultas excluyen las
 publicaciones eliminadas. La creación y modificación validan contenido y
 privacidad; la creación también valida la existencia del autor. La creación de
 etiquetas valida el nombre, su longitud y que no esté duplicado. La
-creación de usuarios valida los datos y almacena la contraseña con BCrypt; los
+creación de usuarios valida los datos y almacena la contraseña con BCrypt; el
+inicio de sesión acepta email o username, valida la contraseña BCrypt y actualiza
+la fecha de último acceso; los
 perfiles admiten creación y edición parcial. La autenticación con inicio de
-sesión y tokens, el feed, la carga/optimización de archivos, la paginación y
-otros requisitos funcionales aún deben completarse antes de considerarlos
-disponibles.
+sesión básico está disponible; el token emitido debe incorporarse a un filtro de
+autorización antes de proteger endpoints completos. El feed, la carga/optimización
+de archivos, la paginación y otros requisitos funcionales aún deben completarse
+antes de considerarlos disponibles.
 
 ## Pruebas
 

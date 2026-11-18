@@ -15,8 +15,7 @@ historial de actividad.
 
 1. **Autenticación:** registro e inicio de sesión con email, usuario y
    contraseña; emitir un token válido al autenticarse. El registro con
-   contraseña codificada está implementado; inicio de sesión y tokens siguen
-   pendientes.
+   contraseña codificada y el inicio de sesión están implementados.
 2. **Perfil:** crear y editar nombre, biografía, avatar, ubicación, enlace y
    visibilidad pública o privada.
 3. **Relaciones:** seguir o dejar de seguir; permitir solicitudes y aprobación

@@ -3,6 +3,8 @@ package co.edu.usbcali.jasan.java.service;
 import co.edu.usbcali.jasan.java.domain.Usuario;
 import co.edu.usbcali.jasan.java.domain.repository.UsuarioRepository;
 import co.edu.usbcali.jasan.java.dto.request.CrearUsuarioRequest;
+import co.edu.usbcali.jasan.java.dto.request.IniciarSesionRequest;
+import co.edu.usbcali.jasan.java.dto.response.IniciarSesionResponse;
 import co.edu.usbcali.jasan.java.dto.response.ObtenerUsuarioResponse;
 import co.edu.usbcali.jasan.java.mapper.UsuarioMapper;
 import org.springframework.http.HttpStatus;
@@ -12,8 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
@@ -81,5 +85,39 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .passwordHash(passwordEncoder.encode(password))
                 .build();
         return UsuarioMapper.usuarioAObtenerUsuarioResponse(usuarioRepository.save(usuario));
+    }
+
+    @Override
+    @Transactional
+    public IniciarSesionResponse iniciarSesion(IniciarSesionRequest request) {
+        if (request == null || request.identificador() == null || request.identificador().isBlank()
+                || request.password() == null || request.password().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El identificador y la contraseña son obligatorios");
+        }
+
+        String identificador = request.identificador().trim();
+        Usuario usuario = identificador.contains("@")
+                ? usuarioRepository.findByEmailIgnoreCase(identificador)
+                        .orElseThrow(() -> credencialesInvalidas())
+                : usuarioRepository.findByUsernameIgnoreCase(identificador)
+                        .orElseThrow(() -> credencialesInvalidas());
+
+        if (!passwordEncoder.matches(request.password(), usuario.getPasswordHash())) {
+            throw credencialesInvalidas();
+        }
+
+        usuario.setLastLogin(LocalDateTime.now());
+        usuario = usuarioRepository.save(usuario);
+        String token = UUID.randomUUID().toString();
+
+        return new IniciarSesionResponse(
+                token,
+                UsuarioMapper.usuarioAObtenerUsuarioResponse(usuario));
+    }
+
+    private ResponseStatusException credencialesInvalidas() {
+        return new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                "Identificador o contraseña incorrectos");
     }
 }

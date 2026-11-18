@@ -1,6 +1,8 @@
 package co.edu.usbcali.jasan.java.controller;
 
 import co.edu.usbcali.jasan.java.dto.request.CrearUsuarioRequest;
+import co.edu.usbcali.jasan.java.dto.request.IniciarSesionRequest;
+import co.edu.usbcali.jasan.java.dto.response.IniciarSesionResponse;
 import co.edu.usbcali.jasan.java.dto.response.ObtenerUsuarioResponse;
 import co.edu.usbcali.jasan.java.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,5 +47,10 @@ public class UsuarioController {
     @PostMapping({"", "/crear"})
     ResponseEntity<ObtenerUsuarioResponse> crearUsuario(@RequestBody CrearUsuarioRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.crearUsuario(request));
+    }
+
+    @PostMapping({"/login", "/iniciar-sesion"})
+    ResponseEntity<IniciarSesionResponse> iniciarSesion(@RequestBody IniciarSesionRequest request) {
+        return ResponseEntity.ok(usuarioService.iniciarSesion(request));
     }
 }
